@@ -35,7 +35,11 @@ def main():
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("ex02proen/fig/pg_bg.jpg")
     kk_img = pg.image.load("ex02proen/fig/3.png")
+    kk_imgs = pg.image.load("ex02proen/fig/6.png")
+    kk_imgs = pg.transform.rotozoom(kk_imgs, 0, 2.0)
     kk_img = pg.transform.rotozoom(kk_img, 0, 2.0)
+    
+
     kk_rct = kk_img.get_rect()  # 練習３：こうかとんSurfaceのRectを抽出する
     bb_imgs = pg.Surface((20, 20))   # 練習１：透明のSurfaceを作る
     bb_imgs.set_colorkey((0, 0, 0))
@@ -44,6 +48,7 @@ def main():
     bb_img.set_colorkey((0, 0, 0))  # 練習１：黒い部分を透明にする
     pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)  # 練習１：赤い半径10の円を描く
     pg.draw.circle(bb_imgs, (0, 255, 0), (10, 10), 10) 
+
     bb_rct = bb_img.get_rect()  # 練習１：爆弾SurfaceのRectを抽出する
     bb_rcts = bb_imgs.get_rect()
     bb_rct.centerx = random.randint(0, WIDTH)
@@ -51,7 +56,7 @@ def main():
     bb_rcts.centerx = random.randint(0, WIDTH)
     bb_rcts.centery = random.randint(0, HEIGHT)
     vx, vy = +5, +5  # 練習２：爆弾の速度
-    vq, vw = +5, +10
+    vq, vw = +5, +5
 
     clock = pg.time.Clock()
     tmr = 0
@@ -66,7 +71,6 @@ def main():
             return    
         if kk_rct.colliderect(bb_rcts):#追加機能新しくボールを追加
             print("Gmae over")
-            return    
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
         for k, tpl in delta.items():
@@ -79,7 +83,19 @@ def main():
         kk_rct.move_ip(sum_mv[0], sum_mv[1])
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
+
         screen.blit(kk_img, kk_rct)  # 練習３：こうかとんを移動させる
+        if  not kk_rct.colliderect(bb_rct):
+            screen.blit(kk_img,kk_rct)
+        else:
+            screen.blit(kk_imgs,kk_rct)
+
+        if  not kk_rct.colliderect(bb_rcts):
+            screen.blit(kk_img,kk_rct)
+        else:
+            screen.blit(kk_imgs,kk_rct)
+ 
+
         bb_rct.move_ip(vx, vy)  # 練習２：爆弾を移動させる
         bb_rcts.move_ip(vq, vw)
         yoko, tate = check_bound(bb_rct)

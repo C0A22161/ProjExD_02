@@ -26,6 +26,8 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
         tate = False
     return yoko, tate
 
+    
+
 
 
 def main():
@@ -35,14 +37,21 @@ def main():
     kk_img = pg.image.load("ex02proen/fig/3.png")
     kk_img = pg.transform.rotozoom(kk_img, 0, 2.0)
     kk_rct = kk_img.get_rect()  # 練習３：こうかとんSurfaceのRectを抽出する
+    bb_imgs = pg.Surface((20, 20))   # 練習１：透明のSurfaceを作る
+    bb_imgs.set_colorkey((0, 0, 0))
     kk_rct.center = 900, 400  # 練習３：こうかとんの初期座標
     bb_img = pg.Surface((20, 20))   # 練習１：透明のSurfaceを作る
     bb_img.set_colorkey((0, 0, 0))  # 練習１：黒い部分を透明にする
     pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)  # 練習１：赤い半径10の円を描く
+    pg.draw.circle(bb_imgs, (0, 255, 0), (10, 10), 10) 
     bb_rct = bb_img.get_rect()  # 練習１：爆弾SurfaceのRectを抽出する
+    bb_rcts = bb_imgs.get_rect()
     bb_rct.centerx = random.randint(0, WIDTH)
     bb_rct.centery = random.randint(0, HEIGHT)
+    bb_rcts.centerx = random.randint(0, WIDTH)
+    bb_rcts.centery = random.randint(0, HEIGHT)
     vx, vy = +5, +5  # 練習２：爆弾の速度
+    vq, vw = +5, +10
 
     clock = pg.time.Clock()
     tmr = 0
@@ -53,6 +62,9 @@ def main():
 
 
         if kk_rct.colliderect(bb_rct):
+            print("Gmae over")
+            return    
+        if kk_rct.colliderect(bb_rcts):#追加機能新しくボールを追加
             print("Gmae over")
             return    
         key_lst = pg.key.get_pressed()
@@ -69,13 +81,21 @@ def main():
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         screen.blit(kk_img, kk_rct)  # 練習３：こうかとんを移動させる
         bb_rct.move_ip(vx, vy)  # 練習２：爆弾を移動させる
+        bb_rcts.move_ip(vq, vw)
         yoko, tate = check_bound(bb_rct)
+        yoko2, tate2 = check_bound(bb_rcts)
         if not yoko:  # 横方向にはみ出たら
             vx *= -1
         if not tate:  # 縦方向にはみ出たら
             vy *= -1
+        if not yoko2:  # 横方向にはみ出たら
+            vq *= -1
+        if not tate2:  # 縦方向にはみ出たら
+            vw *= -1
         bb_rct.move_ip(vx, vy) 
+        bb_rcts.move_ip(vq, vw) 
         screen.blit(bb_img, bb_rct)
+        screen.blit(bb_imgs, bb_rcts)
         pg.display.update()
         tmr += 1
         clock.tick(50)
